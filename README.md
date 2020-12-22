@@ -1,0 +1,1 @@
+# fvtt-autorotate
