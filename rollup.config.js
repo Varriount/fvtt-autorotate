@@ -29,7 +29,7 @@ function is_enabled(key){
       process.env[key] != null &&
       process.env[key].toLowerCase() === 'true'
    );
-   console.log(`Is ${key} enabled... ${enabled ? 'yes' : 'no'}`)
+   console.log(`Is ${key} enabled... ${enabled ? 'yes' : 'no'}`);
    return enabled;
 }
 
@@ -49,8 +49,8 @@ export default () =>
    const TARGET       = process.env.TARGET;
 
    const SHOULD_DEPLOY_SOURCEMAPS = is_enabled('SHOULD_DEPLOY_SOURCEMAPS');
-   const SHOULD_MINIFY            = is_enabled('SHOULD_MINIFY')
-   const SHOULD_OPTIMIZE          = is_enabled('SHOULD_OPTIMIZE')
+   const SHOULD_MINIFY            = is_enabled('SHOULD_MINIFY');
+   const SHOULD_OPTIMIZE          = is_enabled('SHOULD_OPTIMIZE');
 
    // State
    let inputPlugins = [
