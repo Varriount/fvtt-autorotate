@@ -1,5 +1,4 @@
 # Auto-Rotate
-=======
 Auto-Rotate is a FoundryVTT module which allows tokens to automatically rotate based on triggers such as movement, targeting, etc.
 
 Credit goes to [Eadorin](https://github.com/eadorin) for the original [about-face](https://github.com/eadorin/about-face) module. Auto-Rotate has most of the features of about-face, but uses a completely re-worked implementation.
