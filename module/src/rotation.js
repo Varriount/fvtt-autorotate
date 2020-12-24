@@ -133,7 +133,7 @@ async function rotateTokenOnPreUpdate(parent, data, update, options, userId) {
     const deltaX = updateX - data.x;
     const deltaY = updateY - data.y;
 
-
+    rotateViaRotation(deltaX, deltaY, data, update)
 
     const STOP_MOVEMENT = (
         game.keyboard.isDown(SHIFT) &&
