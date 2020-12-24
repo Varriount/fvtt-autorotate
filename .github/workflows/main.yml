@@ -18,11 +18,11 @@ jobs:
           node-version: '14.x'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install -g yarn ; yarn install
 
       # run the build action; choose `build-deploy` if not minifying your output bundle.
       - name: Build deploy directory
-        run: npm run build-release
+        run: yarn run build-release
 
       # create a zip file with all files required by the module to add to the release
       - name: Zip Files
