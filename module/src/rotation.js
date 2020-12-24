@@ -154,8 +154,7 @@ async function rotateTokenOnPreUpdate(parent, data, update, options, userId) {
 async function rotateTokensOnTarget(user, targetToken, targetActive) {
     const skip = !(
         targetActive             &&
-        user.id === game.user.id &&
-        (targetToken.getFlag(core.MODULE_SCOPE, "enabled") || false)
+        user.id === game.user.id
     )
     if (skip){
         return;
@@ -167,18 +166,16 @@ async function rotateTokensOnTarget(user, targetToken, targetActive) {
         return;
     }
 
-    const updates = controlled.map((controlledToken) => {
-        if (controlledToken.id == targetToken.id){
-            return {_id: controlledToken.data._id};
-        }
-        return {
+    const updates = controlled
+        .filter(t => t.id != targetToken.id)
+        .filter(t => t.getFlag(core.MODULE_SCOPE, "enabled"))
+        .map(controlledToken => ({
             _id: controlledToken.data._id,
             rotation: core.pointToAngle(
                 targetToken.data.x - controlledToken.data.x,
                 targetToken.data.y - controlledToken.data.y
             ) - 90
-        };
-    })
+        }));
 
     canvas.tokens.updateMany(updates);
 }
