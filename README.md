@@ -5,6 +5,11 @@ Credit goes to [Eadorin](https://github.com/eadorin) for the original [about-fac
 
 Credit also goes to [TyphonJS's](https://github.com/typhonjs-fvtt) [demo-rollup-module](https://github.com/typhonjs-fvtt/demo-rollup-module) module, which was used as a project template.
 
+## How to Use ##
+  - Open an actor's token configuration by first opening their sheet, then clicking the `Prototype Token` or `Token` labels on the sheet's window bar.
+  - In the token configuration window, click the 'Position".
+  - Enable or disable the checkbox next to "Enable Autorotate". Note that the "Rotation Lock" toggle must be off!
+
 ## Current Functionality ##
   - Per-token rotation settings.
   - Rotation on token movement.

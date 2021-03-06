@@ -3,9 +3,9 @@
   "title": "Auto-Rotate",
   "description": "Allows tokens to automatically rotate based on movement, targeting, etc.",
   "author": "Varriount",
-  "version": "v1.0.0",
+  "version": "v1.1.0",
   "minimumCoreVersion": "0.7.5",
-  "compatibleCoreVersion": "1.0.0",
+  "compatibleCoreVersion": "0.7.9",
 
   "styles": [],
   "esmodules": ["autorotate.js"],
@@ -21,5 +21,5 @@
   "url": "https://github.com/Varriount/fvtt-autorotate",
 
   "manifest": "https://github.com/Varriount/fvtt-autorotate/releases/latest/download/module.json",
-  "download": "https://github.com/Varriount/fvtt-autorotate/releases/download/v1.0.0/module.zip"
+  "download": "https://github.com/Varriount/fvtt-autorotate/releases/download/v1.1.0/module.zip"
 }

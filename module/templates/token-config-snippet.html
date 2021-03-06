@@ -1,9 +1,11 @@
 <div class="form-group">
     <label>{{localize "autorotate.enable-ar"}}</label>
-    <input
-        type="checkbox"
+    <select
         name="flags.autorotate.enabled"
-        data-dtype="Boolean"
-        {{#if enabled}}checked{{/if}}
+        data-dtype="JSON"
     >
+        <option {{#if selectDefault}} selected {{/if}} value="null">Global Default</option>
+        <option {{#if selectYes    }} selected {{/if}} value="true">On</option>
+        <option {{#if selectNo     }} selected {{/if}} value="false">Off</option>
+    </select>
 </div>

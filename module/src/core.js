@@ -1,5 +1,7 @@
+// import version as manifestVersion from '../module.json';
+//
 export const MODULE_SCOPE = 'autorotate';
-
+// export const VERSION = manifestVersion;
 /* ------------------------------------------------------------------------- */
 
 export function getSetting(key){
@@ -12,26 +14,49 @@ export function setSetting(key, value){
 }
 
 
-export function registerSetting(key, value){
+export function registerSetting(key, value, link){
     const typ = value.type;
     if (value?.type?.prototype instanceof FormApplication) {
         return game.settings.registerMenu(MODULE_SCOPE, key, value);       
     }
-    return game.settings.register(MODULE_SCOPE, key, value);
+
+    const originalOnChange = value.onChange;
+    if (link != null) {
+        if (originalOnChange != null) {
+            value.onChange = function (v) {
+                link[key] = v;
+                originalOnChange(v);
+            }
+        } else {
+            value.onChange = function (v) {
+                link[key] = v;
+            }
+        }
+    }
+
+    if (value.default === undefined && link[key] !== undefined){
+        value.default = link[key]
+    }
+
+    const result = game.settings.register(MODULE_SCOPE, key, value);
+    if (value.onChange != null){
+        value.onChange(getSetting(key));
+    }
+    return result;
 }
 
 
-export function registerSettings(settings){
-    for (const [key, value] of Object.entries(settings)){
-        registerSetting(key, value);
+export function registerSettings(link, settings){
+    for (var [key, value] of Object.entries(settings)){
+        registerSetting(key, value, link);
     }
 }
 
 
-export async function getFlag(entity, flag, defaults){
-    let result = entity.getFlag(MODULE_SCOPE, flag)
+export async function getFlag(doc, flag, defaults){
+    let result = doc.getFlag(MODULE_SCOPE, flag)
     if (result === undefined){
-        setFlag(entity, defaults)
+        setFlag(document, defaults)
         result = defaults;
     }
     return result
@@ -58,4 +83,25 @@ export function angleToPoint(angle, radius){
 
 export function escapeRegExp(string) {
   return string.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
+export function toDegrees(radians) {
+  return radians / (Math.PI / 180);
+};
+
+
+export function toRadians(degrees) {
+  return degrees * (Math.PI / 180);
+};
+
+
+export function normalizeDegrees(degrees) {
+  const delta = degrees % 360;
+  return delta < 0 ? delta + 360 : delta;
+}
+
+export function normalizeRadians(radians) {
+  let pi2 = 2 * Math.PI;
+  let nr = (radians + pi2) % pi2;
+  return (nr > Math.PI) ? nr - pi2 : nr;
 }
