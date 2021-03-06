@@ -17,23 +17,43 @@ jobs:
         with:
           node-version: '14.x'
 
-      - name: Install dependencies
-        run: npm install -g yarn ; yarn install
+      - name: Install Dependencies
+        run: |
+          npm install -g yarn
+          yarn install
 
       # run the build action; choose `build-deploy` if not minifying your output bundle.
-      - name: Build deploy directory
-        run: yarn run build-release
+      - name: Build Deploy Directory
+        run: |
+          yarn run build-release
 
       # create a zip file with all files required by the module to add to the release
       - name: Zip Files
         working-directory: ./build
-        run: zip -r ./module.zip ./*
+        run: |
+          zip -r ./module.zip ./*
 
-      # Get the version from 'module.json'
-      - name: Get Version
-        shell: bash
-        id: get-version
-        run: echo "::set-output name=version::$(node ./.github/workflows/get-version.js)"
+      # Get the tag name, for use by later steps
+      - name: Get Tag Name
+        run: |
+          # ${variable#pattern} expands `pattern`, and if it matches the
+          # contents of `variable` starting from the left, removes it.
+          echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
+      # Modify module.json with the correct version
+      - name: Set Version in Manifest
+        env:
+          JQ_PROGRAM: |
+            walk(
+              if type == "string" then
+                gsub("TAG_VERSION"; $ENV.RELEASE_VERSION)
+              else
+                .
+              end
+            )
+        run: |
+          jq "$JQ_PROGRAM" ./build/module.json > ./build/module.new.json
+          mv ./build/module.new.json ./build/module.json
 
       # Generate changelog for release body
       - name: Changelog
@@ -48,11 +68,11 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true # set this to false if you want to prevent updating existing releases
-          name: ${{ steps.get-version.outputs.version }}
+          name: ${{ env.RELEASE_VERSION }}
           body: |
             ${{ steps.Changelog.outputs.changelog }}
           draft: false
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}
           artifacts: './build/module.json,./build/module.zip'
-          tag: ${{ steps.get-version.outputs.version }}
+          tag: ${{ env.RELEASE_VERSION }}
