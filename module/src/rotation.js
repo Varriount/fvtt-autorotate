@@ -101,6 +101,17 @@ const SHIFT = 'Shift';
 //     return tokenImages.filter(i => i.match(degreeSuffixRegex))
 // }
 
+function shouldRotate(token_data){
+    const enabled = token_data.flags[core.MODULE_SCOPE]?.['enabled']
+    return (
+        (
+            enabled === true
+        ) || (
+            enabled == null &&
+            settings.defaultRotationMode === 'automatic'
+        )
+    )
+}
 
 async function rotateViaRotation(deltaX, deltaY, document, update){
     // Convert our delta to an angle, then adjust for the fact that the
@@ -126,33 +137,30 @@ async function rotateViaRotation(deltaX, deltaY, document, update){
 // }
 
 
-async function rotateTokenOnPreUpdate(parent, data, update, options, userId) {
-    const skip = !(
+async function rotateTokenOnPreUpdate(parent, token_data, update, options, userId) {
+    const cont = (
         userId === game.user.id &&
         // autorotate.enabled can be in 3 states: true, false, and undefined.
         // undefined means "use the global default".
-        (
-            data.flags[core.MODULE_SCOPE]?.['enabled'] ??
-            settings.defaultRotationMode === 'automatic'
-        )
+        shouldRotate(token_data)
     )
-    if (skip){
+    if (!cont){
         return;
     }
 
     // At least one part of the token's location must be changing.
     // If a coordinate isn't defined in the set of data to update, we default
     // to the token's current position.
-    const updateX = update.x || data.x;
-    const updateY = update.y || data.y;
-    if (updateX === data.x && updateY === data.y) {
+    const updateX = update.x || token_data.x;
+    const updateY = update.y || token_data.y;
+    if (updateX === token_data.x && updateY === token_data.y) {
         return;
     }
 
-    const deltaX = updateX - data.x;
-    const deltaY = updateY - data.y;
+    const deltaX = updateX - token_data.x;
+    const deltaY = updateY - token_data.y;
 
-    rotateViaRotation(deltaX, deltaY, data, update)
+    rotateViaRotation(deltaX, deltaY, token_data, update)
 
     const STOP_MOVEMENT = (
         game.keyboard.isDown(SHIFT) &&
@@ -171,11 +179,11 @@ async function rotateTokenOnPreUpdate(parent, data, update, options, userId) {
 
 
 async function rotateTokensOnTarget(user, targetToken, targetActive) {
-    const skip = !(
+    const cont = (
         targetActive             &&
         user.id === game.user.id
     )
-    if (skip){
+    if (!cont){
         return;
     }
     
@@ -186,7 +194,7 @@ async function rotateTokensOnTarget(user, targetToken, targetActive) {
     }
 
     const updates = controlled
-        .filter(t => t.getFlag(core.MODULE_SCOPE, "enabled"))
+        .filter(t => shouldRotate(t.data))
         .filter(t => t.id !== targetToken.id)
         .map(controlledToken => ({
             _id: controlledToken.data._id,
