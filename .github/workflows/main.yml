@@ -12,62 +12,78 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: '14.x'
+          node-version: "14.x"
+
 
       - name: Install Dependencies
         run: |
           npm install -g yarn
           yarn install
 
-      # run the build action; choose `build-deploy` if not minifying your output bundle.
-      - name: Build Deploy Directory
+
+      - name: Get Release Version From Tag
+        shell: python
+        run: |
+          import os, re
+          
+          tag = re.sub("^refs/tags/", "", os.environ["GITHUB_REF"])
+          assert tag != os.environ["GITHUB_REF"]
+          
+          with open(os.environ["GITHUB_ENV"], "a") as github_env:
+            github_env.write(f"RELEASE_VERSION={tag}\n")
+
+
+      - name: Prepare Module Manifest
+        shell: python
+        run: |
+          import os, json
+          
+          efmt = lambda s: s.format(**os.environ)
+          repository_url = efmt("{GITHUB_SERVER_URL}/{GITHUB_REPOSITORY}")
+          release_path   = efmt("releases/download/{RELEASE_VERSION}")
+          release_url    = f"{repository_url}/{release_path}"
+          
+          with open("module/module.json", "r+") as fh:
+            # Load the data
+            data = json.load(fh)
+
+            # Update data values
+            data["version"]  = os.environ["RELEASE_VERSION"]
+            data["download"] = f"{release_url}/module.zip"
+
+            # Truncate the file and write the modified data
+            fh.seek(0)
+            fh.truncate(0)
+            json.dump(data, fh, indent=4)
+
+
+      - name: Build Release
         run: |
           yarn run build-release
 
-      # create a zip file with all files required by the module to add to the release
-      - name: Zip Files
+
+      - name: Zip Release
         working-directory: ./build
         run: |
           zip -r ./module.zip ./*
 
-      # Get the tag name, for use by later steps
-      - name: Get Tag Name
-        run: |
-          # ${variable#pattern} expands `pattern`, and if it matches the
-          # contents of `variable` starting from the left, removes it.
-          echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-
-      # Modify module.json with the correct version
-      - name: Set Version in Manifest
-        env:
-          JQ_PROGRAM: |
-            walk(
-              if type == "string" then
-                gsub("TAG_VERSION"; $ENV.RELEASE_VERSION)
-              else
-                .
-              end
-            )
-        run: |
-          jq "$JQ_PROGRAM" ./build/module.json > ./build/module.new.json
-          mv ./build/module.new.json ./build/module.json
 
       # Generate changelog for release body
-      - name: Changelog
-        id: Changelog
+      - name: Generate Changelog
         uses: scottbrenner/generate-changelog-action@master
         env:
           REPO: ${{ github.repository }}
 
+
       # Create a release for this specific version
       - name: Create Release
-        id: create_version_release
         uses: ncipollo/release-action@v1
         with:
-          allowUpdates: true # set this to false if you want to prevent updating existing releases
+          allowUpdates: true
           name: ${{ env.RELEASE_VERSION }}
           body: |
             ${{ steps.Changelog.outputs.changelog }}
