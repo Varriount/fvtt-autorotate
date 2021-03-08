@@ -62,6 +62,10 @@ jobs:
 
 
       - name: Build Release
+        env:
+          SHOULD_DEPLOY_SOURCEMAPS: "true"
+          SHOULD_MINIFY: "true"
+          SHOULD_OPTIMIZE: "true"
         run: |
           yarn run build-release
 
