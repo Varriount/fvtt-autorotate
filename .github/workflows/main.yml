@@ -101,9 +101,10 @@ jobs:
       # Publish the release to FoundryVTT's package repository.
       - name: FoundryVTT AutoPublish
         uses: Varriount/fvtt-autopublish@v1.0.2a
+        environment: default
         with:
-          username: ${{ secrets.FOUNDRY_ADMIN_USER }}
-          password: ${{ secrets.FOUNDRY_ADMIN_PW }}
+          username: ${{ secrets.FOUNDRY_ADMIN_USERNAME }}
+          password: ${{ secrets.FOUNDRY_ADMIN_PASSWORD }}
           module-id: 758
           manifest-url: https://github.com/${{ github.repository }}/releases/download/${{ env.RELEASE_VERSION }}/module.json
           manifest-file: ./build/module.json
