@@ -4,8 +4,8 @@
   "description": "Allows tokens to automatically rotate based on movement, targeting, etc.",
   "author": "Varriount",
   "version": "0.0.0",
-  "minimumCoreVersion": "0.7.5",
-  "compatibleCoreVersion": "0.7.9",
+  "minimumCoreVersion": "0.8.5",
+  "compatibleCoreVersion": "0.8.9",
 
   "styles": [],
   "esmodules": ["autorotate.js"],
