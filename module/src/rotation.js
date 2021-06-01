@@ -137,7 +137,8 @@ async function rotateViaRotation(deltaX, deltaY, document, update){
 // }
 
 
-async function rotateTokenOnPreUpdate(parent, token_data, update, options, userId) {
+async function rotateTokenOnPreUpdate(token_document, change, options, userId) {
+    const token_data = token_document.data
     const cont = (
         userId === game.user.id &&
         // autorotate.enabled can be in 3 states: true, false, and undefined.
@@ -151,16 +152,16 @@ async function rotateTokenOnPreUpdate(parent, token_data, update, options, userI
     // At least one part of the token's location must be changing.
     // If a coordinate isn't defined in the set of data to update, we default
     // to the token's current position.
-    const updateX = update.x || token_data.x;
-    const updateY = update.y || token_data.y;
-    if (updateX === token_data.x && updateY === token_data.y) {
+    const newX = change.x || token_data.x;
+    const newY = change.y || token_data.y;
+    if (newX === token_data.x && newY === token_data.y) {
         return;
     }
 
-    const deltaX = updateX - token_data.x;
-    const deltaY = updateY - token_data.y;
+    const deltaX = newX - token_data.x;
+    const deltaY = newY - token_data.y;
 
-    rotateViaRotation(deltaX, deltaY, token_data, update)
+    await rotateViaRotation(deltaX, deltaY, token_data, change)
 
     const STOP_MOVEMENT = (
         game.keyboard.isDown(SHIFT) &&
@@ -172,8 +173,8 @@ async function rotateTokenOnPreUpdate(parent, token_data, update, options, userI
         )
     );
     if (STOP_MOVEMENT) {
-        update.x = undefined;
-        update.y = undefined;
+        change.x = undefined;
+        change.y = undefined;
     }
 }
 
@@ -203,8 +204,7 @@ async function rotateTokensOnTarget(user, targetToken, targetActive) {
                 targetToken.data.y - controlledToken.data.y
             ) - 90
         }));
-
-    canvas.tokens.updateMany(updates);
+    await canvas.scene.updateEmbeddedDocuments("Token", updates);
 }
 
 

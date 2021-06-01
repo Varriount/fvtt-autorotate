@@ -74,9 +74,7 @@ export default () =>
          ]
       }), 
 
-      // SHOULD_OPTIMIZE && compiler({
-      //    language_in: 'ECMASCRIPT_2020'
-      // })
+      // SHOULD_OPTIMIZE && compiler()
    ].filter((v) => v);
 
    let outputPlugins = [
