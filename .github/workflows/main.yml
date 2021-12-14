@@ -35,7 +35,7 @@ jobs:
         id: sub_manifest_link_version
         uses: microsoft/variable-substitution@6287962da9e5b6e68778dc51e840caa03ca84495
         with:
-          files: 'module.json'
+          files: 'module/module.json'
         env:
           version: ${{steps.get_version.outputs.version-without-v}}
           manifest: https://github.com/${{github.repository}}/releases/latest/download/module.json
