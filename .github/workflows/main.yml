@@ -27,8 +27,15 @@ jobs:
 
 
       - name: Get Release Version From Tag
-        id: get_version
-        uses: battila7/get-version-action@0db33b6cb875aa6bc761ca535b74aef8925a6f0c
+        shell: python
+        run: |
+          import os, re
+          
+          tag = re.sub("^refs/tags/", "", os.environ["GITHUB_REF"])
+          assert tag != os.environ["GITHUB_REF"]
+          
+          with open(os.environ["GITHUB_ENV"], "a") as github_env:
+            github_env.write(f"RELEASE_VERSION={tag}\n")
 
 
       - name: Prepare Module Manifest
