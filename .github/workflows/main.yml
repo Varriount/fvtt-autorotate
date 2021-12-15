@@ -32,14 +32,27 @@ jobs:
 
 
       - name: Prepare Module Manifest
-        id: sub_manifest_link_version
-        uses: microsoft/variable-substitution@6287962da9e5b6e68778dc51e840caa03ca84495
-        with:
-          files: 'module/module.json'
-        env:
-          version: ${{steps.get_version.outputs.version-without-v}}
-          manifest: https://github.com/${{github.repository}}/releases/latest/download/module.json
-          download: https://github.com/${{github.repository}}/releases/download/${{steps.get_version.outputs.version}}/module.zip
+        shell: python
+        run: |
+          import os, json
+          
+          efmt = lambda s: s.format(**os.environ)
+          repository_url = efmt("{GITHUB_SERVER_URL}/{GITHUB_REPOSITORY}")
+          release_path   = efmt("releases/download/{RELEASE_VERSION}")
+          release_url    = f"{repository_url}/{release_path}"
+          
+          with open("module/module.json", "r+") as fh:
+            # Load the data
+            data = json.load(fh)
+
+            # Update data values
+            data["version"]  = os.environ["RELEASE_VERSION"]
+            data["download"] = f"{release_url}/module.zip"
+
+            # Truncate the file and write the modified data
+            fh.seek(0)
+            fh.truncate(0)
+            json.dump(data, fh, indent=4)
 
 
       - name: Build Release
