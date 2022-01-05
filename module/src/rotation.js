@@ -164,12 +164,12 @@ async function rotateTokenOnPreUpdate(token_document, change, options, userId) {
     await rotateViaRotation(deltaX, deltaY, token_data, change)
 
     const STOP_MOVEMENT = (
-        game.keyboard.isDown(SHIFT) &&
+        game.keyboard.downKeys.has(SHIFT) &&
         (
-            game.keyboard.isDown(UP)   || 
-            game.keyboard.isDown(DOWN) ||
-            game.keyboard.isDown(LEFT) ||
-            game.keyboard.isDown(RIGHT)
+            game.keyboard.downKeys.has(UP)   || 
+            game.keyboard.downKeys.has(DOWN) ||
+            game.keyboard.downKeys.has(LEFT) ||
+            game.keyboard.downKeys.has(RIGHT)
         )
     );
     if (STOP_MOVEMENT) {
