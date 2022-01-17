@@ -210,7 +210,7 @@ async function rotateTokensOnTarget(user, targetToken, targetActive) {
 
 async function injectAutoRotateOptions(app, html, data){
     const enabled = data.object.flags[core.MODULE_SCOPE]?.["enabled"]
-    const form = html.find("div[data-tab='position']:first");
+    const form = html.find("div[data-tab='appearance']:first");
     let snippet = await renderTemplate(
         "modules/autorotate/templates/token-config-snippet.html",
         {
