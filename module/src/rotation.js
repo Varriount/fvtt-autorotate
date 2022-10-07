@@ -113,12 +113,18 @@ function shouldRotate(token_data){
     )
 }
 
-async function rotateViaRotation(deltaX, deltaY, document, update){
+function rotationOffset(token_data){
+    const ret = token_data.flags[core.MODULE_SCOPE]?.['offset'];
+	if (ret == null) return 0;
+	return ret;
+}
+
+async function rotateViaRotation(deltaX, deltaY, document, update, offset){
     // Convert our delta to an angle, then adjust for the fact that the
     // rotational perspective in Foundry is shifted 90 degrees
     // counterclockwise.  
     update.rotation = core.normalizeDegrees(
-        core.pointToAngle(deltaX, deltaY) - 90
+        core.pointToAngle(deltaX, deltaY) - 90 + offset
     );
 }
 
@@ -160,8 +166,10 @@ async function rotateTokenOnPreUpdate(token_document, change, options, userId) {
 
     const deltaX = newX - token_data.x;
     const deltaY = newY - token_data.y;
+	
+	const offset = rotationOffset(token_data);
 
-    await rotateViaRotation(deltaX, deltaY, token_data, change)
+    await rotateViaRotation(deltaX, deltaY, token_data, change, offset)
 
     const STOP_MOVEMENT = (
         game.keyboard.downKeys.has(SHIFT) &&
@@ -202,7 +210,7 @@ async function rotateTokensOnTarget(user, targetToken, targetActive) {
             rotation: core.pointToAngle(
                 targetToken.data.x - controlledToken.data.x,
                 targetToken.data.y - controlledToken.data.y
-            ) - 90
+            ) - 90 + rotationOffset(t.Data)
         }));
     await canvas.scene.updateEmbeddedDocuments("Token", updates);
 }
@@ -210,6 +218,7 @@ async function rotateTokensOnTarget(user, targetToken, targetActive) {
 
 async function injectAutoRotateOptions(app, html, data){
     const enabled = data.object.flags[core.MODULE_SCOPE]?.["enabled"]
+    const offset = data.object.flags[core.MODULE_SCOPE]?.["offset"]
     const form = html.find("div[data-tab='appearance']:first");
     let snippet = await renderTemplate(
         "modules/autorotate/templates/token-config-snippet.html",
@@ -217,6 +226,7 @@ async function injectAutoRotateOptions(app, html, data){
             selectDefault: enabled == null,
             selectYes    : enabled === true,
             selectNo     : enabled === false,
+			offsetToSet  : offset,
         }
     );
     form.append(snippet);
