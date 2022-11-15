@@ -144,7 +144,7 @@ async function rotateViaRotation(deltaX, deltaY, document, update, offset){
 
 
 async function rotateTokenOnPreUpdate(token_document, change, options, userId) {
-    const token_data = token_document.data
+    const token_data = token_document
     const cont = (
         userId === game.user.id &&
         // autorotate.enabled can be in 3 states: true, false, and undefined.
@@ -203,13 +203,13 @@ async function rotateTokensOnTarget(user, targetToken, targetActive) {
     }
 
     const updates = controlled
-        .filter(t => shouldRotate(t.data))
+        .filter(t => shouldRotate(t.document))
         .filter(t => t.id !== targetToken.id)
         .map(controlledToken => ({
-            _id: controlledToken.data._id,
+            _id: controlledToken.id,
             rotation: core.pointToAngle(
-                targetToken.data.x - controlledToken.data.x,
-                targetToken.data.y - controlledToken.data.y
+                targetToken.document.x - controlledToken.document.x,
+                targetToken.document.y - controlledToken.document.y
             ) - 90 + rotationOffset(t.Data)
         }));
     await canvas.scene.updateEmbeddedDocuments("Token", updates);
