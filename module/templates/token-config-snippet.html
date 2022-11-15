@@ -8,4 +8,6 @@
         <option {{#if selectYes    }} selected {{/if}} value="true">On</option>
         <option {{#if selectNo     }} selected {{/if}} value="false">Off</option>
     </select>
+    <label>{{localize "autorotate.rotation-offset"}}</label>
+    <input name="flags.autorotate.offset" type="number" data-dtype="Number" value="{{offsetToSet}}" />
 </div>
