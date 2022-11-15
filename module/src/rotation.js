@@ -40,8 +40,8 @@ const RIGHT = 'ArrowRight';
 const SHIFT = 'Shift';
 
 
-function shouldRotate(token_data){
-    const enabled = token_data.flags[core.MODULE_SCOPE]?.['enabled']
+function shouldRotate(tokenDocument){
+    const enabled = tokenDocument.flags[core.MODULE_SCOPE]?.['enabled']
     return (
         (
             enabled === true
@@ -53,8 +53,8 @@ function shouldRotate(token_data){
 }
 
 
-function rotationOffset(token_data){
-    const ret = token_data.flags[core.MODULE_SCOPE]?.['offset'];
+function rotationOffset(tokenDocument){
+    const ret = tokenDocument.flags[core.MODULE_SCOPE]?.['offset'];
     if (ret == null) return 0;
     return ret;
 }
@@ -73,13 +73,12 @@ async function rotateViaRotation(deltaX, deltaY, document, update, offset){
 //// Hooks ////
 
 
-async function rotateTokenOnPreUpdate(token_document, change, options, userId) {
-    const token_data = token_document
+async function rotateTokenOnPreUpdate(tokenDocument, change, options, userId) {
     const cont = (
         userId === game.user.id &&
         // autorotate.enabled can be in 3 states: true, false, and undefined.
         // undefined means "use the global default".
-        shouldRotate(token_data)
+        shouldRotate(tokenDocument)
     )
     if (!cont){
         return;
@@ -88,18 +87,18 @@ async function rotateTokenOnPreUpdate(token_document, change, options, userId) {
     // At least one part of the token's location must be changing.
     // If a coordinate isn't defined in the set of data to update, we default
     // to the token's current position.
-    const newX = change.x || token_data.x;
-    const newY = change.y || token_data.y;
-    if (newX === token_data.x && newY === token_data.y) {
+    const newX = change.x || tokenDocument.x;
+    const newY = change.y || tokenDocument.y;
+    if (newX === tokenDocument.x && newY === tokenDocument.y) {
         return;
     }
 
-    const deltaX = newX - token_data.x;
-    const deltaY = newY - token_data.y;
+    const deltaX = newX - tokenDocument.x;
+    const deltaY = newY - tokenDocument.y;
 
-    const offset = rotationOffset(token_data);
+    const offset = rotationOffset(tokenDocument);
 
-    await rotateViaRotation(deltaX, deltaY, token_data, change, offset)
+    await rotateViaRotation(deltaX, deltaY, tokenDocument, change, offset)
 
     const STOP_MOVEMENT = (
         game.keyboard.downKeys.has(SHIFT) &&
