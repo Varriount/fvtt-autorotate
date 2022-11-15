@@ -1,10 +1,10 @@
 import * as core from "./core.js";
 
-// Settings
+//// Settings ////
 const settings = {
     version: "",
     defaultRotationMode: "regular"
-} 
+}
 
 Hooks.on('ready', () => {
     core.registerSettings(
@@ -29,77 +29,16 @@ Hooks.on('ready', () => {
     );
 })
 
-/* ------------------------------------------------------------------------- */
+
+//// Utility Functions ////
+
+
 const UP = 'ArrowUp';
 const DOWN = 'ArrowDown';
 const LEFT = 'ArrowLeft';
 const RIGHT = 'ArrowRight';
 const SHIFT = 'Shift';
 
-// const DIRECTION_ALIAS = {
-//     0:   "down",
-//     90:  "right",
-//     180: "up",
-//     270: "left",
-//     360: "down",
-// }
-
-
-// function formatString(string, data){
-//     // Formats a string according to the passed in data.
-//     // The string supports the `{}` style of formatting, where a property
-//     // enclosed in curly-braces is replaced with the value of the property
-//     // from the passed in object. 
-// }
-
-
-// function findFiles(pattern){}
-
-// function setTokenSprite(token, spritePath){
-//     // Sets the token's sprite to the one pointed at the specified path.
-// }
-
-// function setTokenSpriteToAction(token, pattern, action){
-//     // Sets the token's sprite to the one pointed to by the given pattern,
-//     // after being formatted with the token's data.
-//     // Available properties:
-//     //   - "sprite-location"
-//     //   - "sprite-filename"
-//     //   - "sprite-extension"
-//     //   - "action"
-// }
-
-// async function getRotationImages(path, pattern, action){
-//     // Modified version of wildcard file handler
-//     // Takes a path, a path pattern, and an action, and creates a new path from them.
-//     const degreeSuffixRegex = /\b(\d+)(\.[^.])$/
-//     const degreeSuffixPattern = path.replace(/\.[^.]$/, "*$&")
-
-//     const browseOptions = { wildcard: true };
-
-//     // Support S3 matching
-//     if ( /\.s3\./.test(pattern) ) {
-//       source = "s3";
-//       const {bucket, keyPrefix} = FilePicker.parseS3URL(pattern);
-//       if ( bucket ) {
-//         browseOptions.bucket = bucket;
-//         pattern = keyPrefix;
-//       }
-//     }
-
-//     // Retrieve wildcard content
-//     let tokenImages = undefined;
-//     try {
-//       const content = await FilePicker.browse(source, pattern, browseOptions);
-//       tokenImages = content.files;
-//     } catch(err) {
-//       tokenImages = [];
-//       ui.notifications.error(err);
-//     }
-
-//     // Retrieve only paths with numeric suffixes
-//     return tokenImages.filter(i => i.match(degreeSuffixRegex))
-// }
 
 function shouldRotate(token_data){
     const enabled = token_data.flags[core.MODULE_SCOPE]?.['enabled']
@@ -113,34 +52,25 @@ function shouldRotate(token_data){
     )
 }
 
+
 function rotationOffset(token_data){
     const ret = token_data.flags[core.MODULE_SCOPE]?.['offset'];
-	if (ret == null) return 0;
-	return ret;
+    if (ret == null) return 0;
+    return ret;
 }
+
 
 async function rotateViaRotation(deltaX, deltaY, document, update, offset){
     // Convert our delta to an angle, then adjust for the fact that the
     // rotational perspective in Foundry is shifted 90 degrees
-    // counterclockwise.  
+    // counterclockwise.
     update.rotation = core.normalizeDegrees(
         core.pointToAngle(deltaX, deltaY) - 90 + offset
     );
 }
 
 
-// const pathToImageCache = new WeakMap()
-// const tokenToImageCache = new WeakMap()
-
-
-// async function rotateViaImages(deltaX, deltaY, document, data){
-//     const token
-//     // Attempt to retrieve cached images associated with token
-//     // If images aren't available, load them
-//     // Calculate rotation
-//     // Find image that has closest match to images
-//     // If image doesn't have an originalImage attribute, set it
-// }
+//// Hooks ////
 
 
 async function rotateTokenOnPreUpdate(token_document, change, options, userId) {
@@ -166,15 +96,15 @@ async function rotateTokenOnPreUpdate(token_document, change, options, userId) {
 
     const deltaX = newX - token_data.x;
     const deltaY = newY - token_data.y;
-	
-	const offset = rotationOffset(token_data);
+
+    const offset = rotationOffset(token_data);
 
     await rotateViaRotation(deltaX, deltaY, token_data, change, offset)
 
     const STOP_MOVEMENT = (
         game.keyboard.downKeys.has(SHIFT) &&
         (
-            game.keyboard.downKeys.has(UP)   || 
+            game.keyboard.downKeys.has(UP)   ||
             game.keyboard.downKeys.has(DOWN) ||
             game.keyboard.downKeys.has(LEFT) ||
             game.keyboard.downKeys.has(RIGHT)
@@ -195,7 +125,7 @@ async function rotateTokensOnTarget(user, targetToken, targetActive) {
     if (!cont){
         return;
     }
-    
+
     // The user must have at least one token controlled
     const controlled = canvas.tokens.controlled;
     if (controlled.length === 0) {
@@ -226,7 +156,7 @@ async function injectAutoRotateOptions(app, html, data){
             selectDefault: enabled == null,
             selectYes    : enabled === true,
             selectNo     : enabled === false,
-			offsetToSet  : offset,
+            offsetToSet  : offset,
         }
     );
     form.append(snippet);
