@@ -40,8 +40,14 @@ const RIGHT = 'ArrowRight';
 const SHIFT = 'Shift';
 
 
+function getFlag(document, flag){
+    return document.flags[core.MODULE_SCOPE]?.[flag];
+}
+
+
 function shouldRotate(tokenDocument){
-    const enabled = tokenDocument.flags[core.MODULE_SCOPE]?.['enabled']
+    // `null` if not set, otherwise `true` or `false`
+    const enabled = getFlag(tokenDocument, 'enabled');
     return (
         (
             enabled === true
@@ -54,17 +60,17 @@ function shouldRotate(tokenDocument){
 
 
 function rotationOffset(tokenDocument){
-    const ret = tokenDocument.flags[core.MODULE_SCOPE]?.['offset'];
-    if (ret == null) return 0;
-    return ret;
+    const offset = getFlag(tokenDocument, 'offset');
+    if (offset == null) return 0;
+    return offset;
 }
 
 
-async function rotateViaRotation(deltaX, deltaY, document, update, offset){
+function rotationFromPositionDelta(deltaX, deltaY, offset){
     // Convert our delta to an angle, then adjust for the fact that the
     // rotational perspective in Foundry is shifted 90 degrees
     // counterclockwise.
-    update.rotation = core.normalizeDegrees(
+    return core.normalizeDegrees(
         core.pointToAngle(deltaX, deltaY) - 90 + offset
     );
 }
@@ -76,8 +82,6 @@ async function rotateViaRotation(deltaX, deltaY, document, update, offset){
 async function rotateTokenOnPreUpdate(tokenDocument, change, options, userId) {
     const cont = (
         userId === game.user.id &&
-        // autorotate.enabled can be in 3 states: true, false, and undefined.
-        // undefined means "use the global default".
         shouldRotate(tokenDocument)
     )
     if (!cont){
@@ -98,7 +102,7 @@ async function rotateTokenOnPreUpdate(tokenDocument, change, options, userId) {
 
     const offset = rotationOffset(tokenDocument);
 
-    await rotateViaRotation(deltaX, deltaY, tokenDocument, change, offset)
+    change.rotation = rotationFromPositionDelta(deltaX, deltaY, offset);
 
     const STOP_MOVEMENT = (
         game.keyboard.downKeys.has(SHIFT) &&
@@ -136,10 +140,11 @@ async function rotateTokensOnTarget(user, targetToken, targetActive) {
         .filter(t => t.id !== targetToken.id)
         .map(controlledToken => ({
             _id: controlledToken.id,
-            rotation: core.pointToAngle(
+            rotation: rotationFromPositionDelta(
                 targetToken.document.x - controlledToken.document.x,
-                targetToken.document.y - controlledToken.document.y
-            ) - 90 + rotationOffset(t.Data)
+                targetToken.document.y - controlledToken.document.y,
+                rotationOffset(t.Data)
+            )
         }));
     await canvas.scene.updateEmbeddedDocuments("Token", updates);
 }
