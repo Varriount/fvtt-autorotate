@@ -143,7 +143,7 @@ async function rotateTokensOnTarget(user, targetToken, targetActive) {
             rotation: rotationFromPositionDelta(
                 targetToken.document.x - controlledToken.document.x,
                 targetToken.document.y - controlledToken.document.y,
-                rotationOffset(t.Data)
+                rotationOffset(controlledToken.document)
             )
         }));
     await canvas.scene.updateEmbeddedDocuments("Token", updates);
