@@ -4,9 +4,11 @@
   "homepage": "https://github.com/Varriount/fvtt-autorotate",
   "description": "Foundry VTT module to automatically rotate tokens based on various actions.",
   "license": "MIT",
-  "author": {
-    "name": "Varriount"
-  },
+  "authors": [
+    {
+      "name": "Varriount"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/Varriount/fvtt-autorotate.git"
