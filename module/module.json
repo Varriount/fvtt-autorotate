@@ -3,7 +3,12 @@
   "name": "autorotate",
   "title": "Auto-Rotate",
   "description": "Allows tokens to automatically rotate based on movement, targeting, etc.",
-  "author": "Varriount",
+  "authors": [
+    {
+      "name": "Varriount",
+      "url": "https://github.com/Varriount"
+    }
+  ],
   "version": "0.0.0",
   "compatibility": {
     "minimum": "10",
