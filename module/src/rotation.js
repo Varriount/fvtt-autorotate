@@ -82,7 +82,8 @@ function rotationFromPositionDelta(deltaX, deltaY, offset){
 async function rotateTokenOnPreUpdate(tokenDocument, change, options, userId) {
     const cont = (
         userId === game.user.id &&
-        shouldRotate(tokenDocument)
+        shouldRotate(tokenDocument) &&
+		!options.RidingMovement //for rideable compatibility
     )
     if (!cont){
         return;
